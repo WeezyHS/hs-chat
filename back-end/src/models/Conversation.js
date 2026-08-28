@@ -37,10 +37,18 @@ export async function getConversationsByUser(userId) {
                     { _id: otherUserId },
                     { projection: { password: 0 } }
                 );
+            
+            const lastMessage = await db
+                .collection('message')
+                .find({ conversationId: conv._id })
+                .sort({ createdAt: -1 })
+                .limit(1)
+                .toArray();
 
             return {
                 _id: conv._id,
                 otherUser,
+                lastMessage: lastMessage[0] || null,
             };
         })
     );
