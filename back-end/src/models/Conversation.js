@@ -20,8 +20,30 @@ export async function findOrCreateConversation(userId1, userId2) {
 
 export async function getConversationsByUser(userId) {
     const db = await connectDB();
-    return db
+    const conversations = await db
         .collection('conversations')
         .find({ participants: new ObjectId(userId) })
         .toArray();
+    
+    const populated = await Promise.all(
+        conversations.map(async (conv) => {
+            const otherUserId = conv.participants.find(
+                (id) => id.toString() !== userId
+            );
+
+            const otherUser = await db
+                .collection('users')
+                .findOne(
+                    { _id: otherUserId },
+                    { projection: { password: 0 } }
+                );
+
+            return {
+                _id: conv._id,
+                otherUser,
+            };
+        })
+    );
+
+    return populated;
 }

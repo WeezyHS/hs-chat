@@ -6,7 +6,7 @@ import { users, conversations } from '../../mocks/data'
 function Chat() {
     return (
         <div className="flex h-screen">
-            <Sidebar conversations={conversations} />
+            <Sidebar />
             <ChatWindow />
             <UserList users={users} />
         </div>

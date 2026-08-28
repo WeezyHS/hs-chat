@@ -1,5 +1,5 @@
 import express from 'express';
-import { findOrCreateConversation } from '../models/Conversation.js';
+import { findOrCreateConversation, getConversationsByUser } from '../models/Conversation.js';
 
 const router = express.Router();
 
@@ -15,6 +15,17 @@ router.post("/", async (req, res) => {
         res.json(conversation);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao criar/abrir conversa!' });
+    }
+});
+
+router.get('/user/:userId', async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const conversations = await getConversationsByUser(userId);
+        res.json(conversations);
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao buscar conversas' });
     }
 });
 

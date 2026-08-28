@@ -1,11 +1,27 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
-function Sidebar({ conversations }) {
+function Sidebar() {
     const navigate = useNavigate();
+    const { conversationId } = useParams();
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
+    const [conversations, setConversations] = useState([]);
+
+    const loggedUser = JSON.parse(localStorage.getItem('user'));
+
+    useEffect(() => {
+        async function loadConversations() {
+            const response = await fetch(
+                `http://localhost:3000/conversations/user/${loggedUser.id}`
+            );
+            const data = await response.json();
+            setConversations(data);
+        }
+
+        loadConversations();
+    }, [conversationId]);
 
     useEffect(() => {
         if (searchTerm.trim() === '') {
@@ -45,7 +61,7 @@ function Sidebar({ conversations }) {
         });
 
         const conversation = await response.json();
-
+        setSearchTerm('');
         navigate(`/chat/${conversation._id}`);
     }
 
@@ -83,12 +99,14 @@ function Sidebar({ conversations }) {
                         <p className="text-2xl font-semibold mb-2">Conversas</p>
                         <ul>
                             {conversations.map((conv) => (
-                                <li key={conv.id} className="py-2 border-b border-gray-700">
-                                    <strong>{conv.name}</strong>
-                                    <p>{conv.lastMessage}</p>
+                                <li key={conv._id} onClick={() => navigate(`/chat/${conv._id}`)} className={`py-2 border-b border-gray-700 cursor-pointer hover:bg-gray-800 ${conv._id === conversationId ? 'bg-gray-800' : ''}`}>
+                                    <strong>{conv.otherUser?.username}</strong>
                                 </li>
                             ))}
                         </ul>
+                        {conversations.length === 0 && (
+                            <p className="text-gray-400 text-sm">Nenhuma conversa ainda. Busque alguém!</p>
+                        )}
                     </>
                 )}
             </div>

@@ -15,10 +15,10 @@ export async function saveMessage({ conversationId, authorId, text }) {
     return { _id: result.insertedId, ...message };
 }
 
-export async function getMessagesByConversations(conversationId) {
+export async function getMessagesByConversation(conversationId) {
     const db = await connectDB();
     return db
-        .collection('messages')
+        .collection('message')
         .find({ conversationId: new ObjectId(conversationId) })
         .sort({ createdAt: 1 })
         .toArray();

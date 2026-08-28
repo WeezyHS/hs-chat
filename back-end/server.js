@@ -6,6 +6,7 @@ import authRoutes from './src/routes/authRoutes.js';
 import userRoutes from './src/routes/userRoutes.js';
 import conversationRoutes from './src/routes/conversationRoutes.js';
 import { saveMessage } from './src/models/Message.js';
+import messageRoutes from './src/routes/messageRoutes.js';
 
 const app = express();
 app.use(cors());
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/conversations', conversationRoutes);
+app.use('/messages', messageRoutes);
 
 const httpServer = createServer(app);
 
