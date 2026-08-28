@@ -1,8 +1,9 @@
 import express from 'express';
-import { findOrCreateConversation, getConversationsByUser } from '../models/Conversation.js';
+import { findOrCreateConversation, getConversationsByUser, deleteConversationAndMessages } from '../models/Conversation.js';
 
 const router = express.Router();
 
+//Command in database for create/open conversation
 router.post("/", async (req, res) => {
     const { userId1, userId2 } = req.body;
 
@@ -18,6 +19,19 @@ router.post("/", async (req, res) => {
     }
 });
 
+//Command for delete conversation
+router.delete('/:conversationId', async (req, res) => {
+    const { conversationId } = req.params;
+
+    try {
+        await deleteConversationAndMessages(conversationId);
+        res.json({ message: 'Conversa excluída!' });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao excluir conversa!' });
+    }
+})
+
+//Command for search conversation
 router.get('/user/:userId', async (req, res) => {
     const { userId } = req.params;
 

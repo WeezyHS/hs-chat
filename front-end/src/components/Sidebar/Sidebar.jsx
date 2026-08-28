@@ -105,13 +105,34 @@ function Sidebar() {
                                 const isOwn = lastMsg && lastMsg.authorId === loggedUser.id;
                                 const time = lastMsg ? new Date(lastMsg.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false }) : '';
 
+                                async function handleDelete(e) {
+                                    e.stopPropagation();
+                                    
+                                    if (!confirm("Deseja realmente excluir essa conversa?")) return;
+
+                                    await fetch(`http://localhost:3000/conversations/${conv._id}`, { method: 'DELETE' });
+                                    setConversations((prev) => prev.filter((c) => c._id !== conv._id));
+                                    if (conversationId === conv._id) navigate('/chat');
+                                }
+
                                 return (
-                                    <li key={conv._id} onClick={() => navigate(`/chat/${conv._id}`)} className={`py-2 px-1 border-b border-gray-700 cursor-pointer hover:bg-gray-800 ${conv._id === conversationId ? 'bg-gray-800' : ''}`}>
+                                    <li key={conv._id} onClick={() => navigate(`/chat/${conv._id}`)} className={`group/item py-2 px-1 border-b border-gray-700 cursor-pointer hover:bg-gray-800 ${conv._id === conversationId ? 'bg-gray-800' : ''}`}>
                                         <div className="flex justify-between items-center mb-0.5">
                                             <strong className="text-sm">{conv.otherUser?.username}</strong>
-                                            {time && <span className="text-xs text-gray-400">{time}</span>}
+                                            <div className="flex items-center gap-2">
+                                                {time && <span className="text-xs text-gray-400">{time}</span>}
+                                                <button onClick={handleDelete} title="Excluir conversa" className="group-hover/item:opacity-100 w-6 h-6 flex items-center justify-center rounded text-gray-500 hover:text-red-400 hover:bg-red-900/30 transition-all">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                                        <path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6"></path>
+                                                        <path d="M10 11v6"></path>
+                                                        <path d="M14 11v6"></path>
+                                                        <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         </div>
-                                        <p className="text-gray-400 truncate">{isOwn && <span className="text-indigo-400">Você: </span>} {clipped}</p>
+                                        <p className="text-gray-400 truncate">{isOwn && <span className="text-indigo-400">Você: </span>}{clipped}</p>
                                     </li>
                                 )
                             })}

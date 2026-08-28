@@ -18,6 +18,17 @@ export async function findOrCreateConversation(userId1, userId2) {
     return { _id: result.insertedId, participants: [userId1, userId2] };
 }
 
+//Function for delete all conversation
+export async function deleteConversationAndMessages(conversationId) {
+    const db = await connectDB();
+    const id = new ObjectId(conversationId);
+
+    await db.collection('message').deleteMany({ conversationId: id });
+    const result = await db.collection('conversations').deleteOne({ _id: id });
+
+    return result;
+}
+
 export async function getConversationsByUser(userId) {
     const db = await connectDB();
     const conversations = await db
