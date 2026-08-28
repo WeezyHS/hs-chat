@@ -18,9 +18,15 @@ function ChatWindow() {
         }
 
         async function loadMessages() {
-            const response = await fetch(`http://localhost:3000/messages/${conversationId}`);
-            const data = await response.json();
-            setMessages(data);
+
+            try {
+                const response = await fetch(`http://localhost:3000/messages/${conversationId}`);
+                const data = await response.json();
+                setMessages(Array.isArray(data) ? data : []);
+            } catch (err) {
+                console.error("Erro ao carregar mensagens", err);
+                setMessages([]);
+            }
         }
 
         loadMessages();
@@ -45,12 +51,22 @@ function ChatWindow() {
                 setOtherUser(null);
                 return;
             }
-            const response = await fetch(
-                `http://localhost:3000/conversations/user/${loggedUser.id}`
-            );
-            const convs = await response.json();
-            const found = convs.find((c) => c._id === conversationId);
-            setOtherUser(found?.otherUser || null);
+
+            try {
+                const response = await fetch(
+                    `http://localhost:3000/conversations/user/${loggedUser.id}`
+                );
+                const convs = await response.json();
+                if (Array.isArray(convs)) {
+                    const found = convs.find((c) => c._id === conversationId);
+                    setOtherUser(found?.otherUser || null);
+                } else {
+                    setOtherUser(null);
+                }
+            } catch (err) {
+                console.error("Erro ao carregar conversas!");
+                setOtherUser(null);
+            }
         }
         loadOtherUser();
     }, [conversationId]);

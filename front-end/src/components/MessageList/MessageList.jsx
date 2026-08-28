@@ -1,9 +1,10 @@
 function MessageList({ messages }) {
     const loggedUser = JSON.parse(localStorage.getItem('user'));
+    const safeMessages = Array.isArray(messages) ? messages : [];
 
     return (
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
-            {messages.map((msg) => {
+            {safeMessages.map((msg) => {
                 const isOwnMessage = msg.authorId === loggedUser.id;
                 const date = new Date(msg.createdAt);
                 const clock = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false });
