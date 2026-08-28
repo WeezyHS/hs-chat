@@ -98,11 +98,23 @@ function Sidebar() {
                     <>
                         <p className="text-2xl font-semibold mb-2">Conversas</p>
                         <ul>
-                            {conversations.map((conv) => (
-                                <li key={conv._id} onClick={() => navigate(`/chat/${conv._id}`)} className={`py-2 border-b border-gray-700 cursor-pointer hover:bg-gray-800 ${conv._id === conversationId ? 'bg-gray-800' : ''}`}>
-                                    <strong>{conv.otherUser?.username}</strong>
-                                </li>
-                            ))}
+                            {conversations.map((conv) => {
+                                const lastMsg = conv.lastMessage;
+                                const preview = lastMsg ? lastMsg.text : 'Sem mensagens ainda!';
+                                const clipped = preview.length > 28 ? preview.slice(0, 28) + '...' : preview;
+                                const isOwn = lastMsg && lastMsg.authorId === loggedUser.id;
+                                const time = lastMsg ? new Date(lastMsg.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false }) : '';
+
+                                return (
+                                    <li key={conv._id} onClick={() => navigate(`/chat/${conv._id}`)} className={`py-2 px-1 border-b border-gray-700 cursor-pointer hover:bg-gray-800 ${conv._id === conversationId ? 'bg-gray-800' : ''}`}>
+                                        <div className="flex justify-between items-center mb-0.5">
+                                            <strong className="text-sm">{conv.otherUser?.username}</strong>
+                                            {time && <span className="text-xs text-gray-400">{time}</span>}
+                                        </div>
+                                        <p className="text-gray-400 truncate">{isOwn && <span className="text-indigo-400">Você: </span>} {clipped}</p>
+                                    </li>
+                                )
+                            })}
                         </ul>
                         {conversations.length === 0 && (
                             <p className="text-gray-400 text-sm">Nenhuma conversa ainda. Busque alguém!</p>
